@@ -11,6 +11,7 @@ library(readxl)
 
 # tidying -----------------------------------------------------------------
 testDat <- read_excel('C:/Users/Daniel.Feeney/Documents/Proprioception/04_Proprioception.xlsx', skip = 1)
+testDat <- testDat[1:50,]
 
 barefoot <- testDat[,1:2]
 barefoot <- rename(barefoot, ACTUAL = `Order:...1`, GUESS = `Guess:...2`)
@@ -102,4 +103,38 @@ ROCdat <- rbind(fourFiveBF, fourFiveLace, fourFiveSD, fourFiveDD, threeFourBF, t
 
 ggplot(data = ROCdat, mapping = aes(x = FPR, y = TPR, color = Cond)) + geom_line() + geom_abline(slope = 1, intercept = 0) +
   xlab('False Positive Rate (1-specificity)') + ylab('True Positive Rate (sensitivity)') + facet_wrap(~ Comparison)
+
+
+AUC_calc2 <- numeric(length = 5)
+calcAUC <- function(inputDF) {
+  ROC_calc <- 0
+  for (i in c(1:5)) {
+    
+    if (i == 1) {
+      AUC_calc <- (inputDF$FPR[i] * inputDF$TPR[i])/2
+      #AUC_calc2[i] <- AUC_calc
+    }
+    
+    else {
+      tmp_tri <- 0.5*((inputDF$FPR[i] - inputDF$FPR[i-1]) * (inputDF$TPR[i] - inputDF$TPR[i-1]))
+      tmp_square <- inputDF$TPR[i-1] * (inputDF$FPR[i] - inputDF$FPR[i-1])
+      AUC_calc <- AUC_calc + tmp_tri + tmp_square
+      #AUC_calc2[i] <- tmp_tri + tmp_square
+    }
+  }
+  return(AUC_calc)
+}
+
+# Testing AUC function ----------------------------------------------------
+
+TPR <- c(0.25, 0.5, 0.75, 0.8, 1)
+FPR <- c(0.25, 0.5, 0.75, 0.8, 1)
+fakeDF <- data.frame(TPR, FPR)
+calcAUC(fakeDF)
+
+
+calcAUC(twoThreeDD)
+calcAUC(fourFiveSD)
+calcAUC(threeFourBF)
+
 
