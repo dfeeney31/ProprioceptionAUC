@@ -29,7 +29,7 @@ confusBF <- confusionMatrix(
   as.factor(barefoot$GUESS)
 )
 
-confusDatSD <- confusionMatrix(
+confusSD <- confusionMatrix(
   as.factor(SD$ACTUAL),
   as.factor(SD$GUESS)
 )
@@ -60,10 +60,10 @@ colnames(cumProbBF) <- c("one","two","three","four","five")
 cumProbLace <- as.data.frame(apply(cumProbLace, 2, function(x) x/max(x)))
 colnames(cumProbLace) <- c("one","two","three","four","five")
 
-cumProbSD <- as.data.frame(apply(cumProbBF, 2, function(x) x/max(x)))
+cumProbSD <- as.data.frame(apply(cumProbSD, 2, function(x) x/max(x)))
 colnames(cumProbSD) <- c("one","two","three","four","five")
 
-cumProbDD <- as.data.frame(apply(cumProbLace, 2, function(x) x/max(x)))
+cumProbDD <- as.data.frame(apply(cumProbDD, 2, function(x) x/max(x)))
 colnames(cumProbDD) <- c("one","two","three","four","five")
 
 # Do some tidying to make into tidy DFs -----------------------------------
