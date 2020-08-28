@@ -171,3 +171,26 @@ for (comp in unique(ROCdat$Comparison)) {
   }
   print(data.frame(condTmp, aucTmp, tmpComp))
 }
+
+
+condTmp <- vector(length = 16)
+aucTmp <- vector(length = 16)
+tmpComp <- rep(comp, 16)
+count <- 1
+for (comp in unique(ROCdat$Comparison)) {
+  tmpCompDF <- subset(ROCdat, ROCdat$Comparison == comp) #subset into a large DF with a given comparison (e.g. four vs five)
+
+  for (cond in unique(tmpCompDF$Cond)){ #subset into a condition within the comparison (e.g. lace)
+    tmp_dat <- subset(tmpCompDF, tmpCompDF$Cond == cond)
+    condTmp[count] <- cond
+    aucTmp[count] <- calcAUC(tmp_dat)
+    tmpComp[count] <- comp
+    count <- count +1
+  }
+}
+
+AUC_dat <- data.frame(condTmp, aucTmp, tmpComp)
+
+AUC_dat %>%
+  group_by(condTmp) %>%
+  summarize(avgAUC = mean(aucTmp))
