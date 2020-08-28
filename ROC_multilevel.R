@@ -112,14 +112,12 @@ calcAUC <- function(inputDF) {
     
     if (i == 1) {
       AUC_calc <- (inputDF$FPR[i] * inputDF$TPR[i])/2
-      #AUC_calc2[i] <- AUC_calc
     }
     
     else {
       tmp_tri <- 0.5*((inputDF$FPR[i] - inputDF$FPR[i-1]) * (inputDF$TPR[i] - inputDF$TPR[i-1]))
       tmp_square <- inputDF$TPR[i-1] * (inputDF$FPR[i] - inputDF$FPR[i-1])
       AUC_calc <- AUC_calc + tmp_tri + tmp_square
-      #AUC_calc2[i] <- tmp_tri + tmp_square
     }
   }
   return(AUC_calc)
@@ -134,7 +132,42 @@ calcAUC(fakeDF)
 
 
 calcAUC(twoThreeDD)
-calcAUC(fourFiveSD)
-calcAUC(threeFourBF)
 
 
+fourFiveDat <- subset(ROCdat, ROCdat$Comparison == 'fourFive')
+threeFourDat <- subset(ROCdat, ROCdat$Comparison == 'threeFour')
+twoThreeDat <- subset(ROCdat, ROCdat$Comparison == 'twoThree')
+oneTwoDat <- subset(ROCdat, ROCdat$Comparison == 'oneTwo')
+
+condTmp <- vector(length =4)
+aucTmp <- vector(length = 4)
+count <- 1
+for (cond in unique(fourFiveDat$Cond)){
+  tmp_dat <- subset(fourFiveDat, fourFiveDat$Cond == cond)
+  condTmp[count] <- cond
+  aucTmp[count] <- calcAUC(tmp_dat)
+  count <- count +1
+}
+data.frame(condTmp, aucTmp)
+
+
+# Get jiggy with it -------------------------------------------------------
+df <- data.frame(matrix(ncol = 3, nrow = 0))
+x <- c("condTmp", "aucTmp", "tmpComp")
+colnames(df) <- x
+
+for (comp in unique(ROCdat$Comparison)) {
+  tmpCompDF <- subset(ROCdat, ROCdat$Comparison == comp) #subset into a large DF with a given comparison (e.g. four vs five)
+  
+  condTmp <- vector(length = 4)
+  aucTmp <- vector(length = 4)
+  tmpComp <- rep(comp, 4)
+  count <- 1
+  for (cond in unique(tmpCompDF$Cond)){ #subset into a condition within the comparison (e.g. lace)
+    tmp_dat <- subset(tmpCompDF, tmpCompDF$Cond == cond)
+    condTmp[count] <- cond
+    aucTmp[count] <- calcAUC(tmp_dat)
+    count <- count +1
+  }
+  print(data.frame(condTmp, aucTmp, tmpComp))
+}
