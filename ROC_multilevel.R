@@ -194,3 +194,6 @@ AUC_dat <- data.frame(condTmp, aucTmp, tmpComp)
 AUC_dat %>%
   group_by(condTmp) %>%
   summarize(avgAUC = mean(aucTmp))
+
+ggplot(dat = AUC_dat, mapping = aes(x = tmpComp, y = aucTmp, fill = condTmp)) + geom_col(position = 'dodge2') +
+  ylab('AUC') + xlab('Comparison Level')
