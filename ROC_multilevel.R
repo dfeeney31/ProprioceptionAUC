@@ -10,7 +10,7 @@ library(caret)
 library(readxl)
 
 # tidying -----------------------------------------------------------------
-testDat <- read_excel('C:/Users/Daniel.Feeney/Documents/Proprioception/04_Proprioception.xlsx', skip = 1)
+testDat <- read_excel('C:/Users/Daniel.Feeney/Dropbox (Boa)/Endurance Health Validation/Proprioception/01_Proprioception_addedEntries.xlsx', skip = 2)
 testDat <- testDat[1:50,]
 
 barefoot <- testDat[,1:2]
@@ -152,34 +152,16 @@ data.frame(condTmp, aucTmp)
 
 
 # Get jiggy with it -------------------------------------------------------
-df <- data.frame(matrix(ncol = 3, nrow = 0))
-x <- c("condTmp", "aucTmp", "tmpComp")
-colnames(df) <- x
-
-for (comp in unique(ROCdat$Comparison)) {
-  tmpCompDF <- subset(ROCdat, ROCdat$Comparison == comp) #subset into a large DF with a given comparison (e.g. four vs five)
-  
-  condTmp <- vector(length = 4)
-  aucTmp <- vector(length = 4)
-  tmpComp <- rep(comp, 4)
-  count <- 1
-  for (cond in unique(tmpCompDF$Cond)){ #subset into a condition within the comparison (e.g. lace)
-    tmp_dat <- subset(tmpCompDF, tmpCompDF$Cond == cond)
-    condTmp[count] <- cond
-    aucTmp[count] <- calcAUC(tmp_dat)
-    count <- count +1
-  }
-  print(data.frame(condTmp, aucTmp, tmpComp))
-}
 
 
+# try 2
 condTmp <- vector(length = 16)
 aucTmp <- vector(length = 16)
-tmpComp <- rep(comp, 16)
+tmpComp <- rep('comp', 16)
 count <- 1
 for (comp in unique(ROCdat$Comparison)) {
   tmpCompDF <- subset(ROCdat, ROCdat$Comparison == comp) #subset into a large DF with a given comparison (e.g. four vs five)
-
+  
   for (cond in unique(tmpCompDF$Cond)){ #subset into a condition within the comparison (e.g. lace)
     tmp_dat <- subset(tmpCompDF, tmpCompDF$Cond == cond)
     condTmp[count] <- cond
@@ -187,13 +169,7 @@ for (comp in unique(ROCdat$Comparison)) {
     tmpComp[count] <- comp
     count <- count +1
   }
+print(data.frame(condTmp, aucTmp, tmpComp))
 }
+output <- data.frame(condTmp, aucTmp, tmpComp)
 
-AUC_dat <- data.frame(condTmp, aucTmp, tmpComp)
-
-AUC_dat %>%
-  group_by(condTmp) %>%
-  summarize(avgAUC = mean(aucTmp))
-
-ggplot(dat = AUC_dat, mapping = aes(x = tmpComp, y = aucTmp, fill = condTmp)) + geom_col(position = 'dodge2') +
-  ylab('AUC') + xlab('Comparison Level')
